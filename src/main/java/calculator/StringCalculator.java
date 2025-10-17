@@ -9,7 +9,7 @@ public class StringCalculator {
     }
 
     private int[] StringSplit(String input) {
-        String[] separators = {";", ","};
+        String[] separators = {":", ","};
         String extraSeparator = addCustomSeparator(input);
 
         String regex = String.join("|", separators);
@@ -31,7 +31,6 @@ public class StringCalculator {
             charCnt[idx++] = Integer.parseInt(t);
         }
 
-        // 실제 사용 길이만큼 배열 복사
         int[] result = new int[idx];
         for (int i = 0; i < idx; i++) {
             result[i] = charCnt[i];
