@@ -9,14 +9,32 @@ public class StringCalculator {
     }
 
     private int[] StringSplit(String input) {
-        String[] separators = {":", ","};
+        String[] separators = {";", ","};
+        String extraSeparator = addCustomSeparator(input);
+
         String regex = String.join("|", separators);
 
-        String[] tokens = input.split(regex);
+        if (extraSeparator != null) {
+            regex += "|" + extraSeparator;
 
-        int[] result = new int[tokens.length];
-        for (int i = 0; i < tokens.length; i++) {
-            result[i] = Integer.parseInt(tokens[i]);
+            int ed = input.indexOf("\\n");
+            input = input.substring(ed + 2);
+        }
+
+        String[] chars = input.split(regex);
+
+        int[] charCnt = new int[chars.length];
+        int idx = 0;
+        for (String ch : chars) {
+            String t = ch.trim();
+            if (t.isEmpty()) continue;
+            charCnt[idx++] = Integer.parseInt(t);
+        }
+
+        // 실제 사용 길이만큼 배열 복사
+        int[] result = new int[idx];
+        for (int i = 0; i < idx; i++) {
+            result[i] = charCnt[i];
         }
 
         return result;
@@ -28,6 +46,17 @@ public class StringCalculator {
             sum += number;
         }
         return sum;
+    }
+
+    private String addCustomSeparator(String input) {
+        String separator = null;
+        int st, ed;
+        st = input.indexOf("//");
+        ed = input.indexOf("\\n");
+        if (st != -1 && ed != -1) {
+            separator = input.substring(st + 2, ed);
+        }
+        return separator;
     }
 
     public void calculateString() {
