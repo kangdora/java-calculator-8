@@ -17,7 +17,7 @@ public class StringCalculator {
         String[] basicSeparators = {":", ","};
         String extraSeparator = addCustomSeparator(input);
 
-        String regex = String.join("|", basicSeparators);
+        String regex = buildRegex(basicSeparators, "-".equals(extraSeparator) ? null : extraSeparator);
 
         if (extraSeparator != null) {
             if (!"-".equals(extraSeparator)) {
@@ -42,7 +42,7 @@ public class StringCalculator {
             }
         }
 
-        String[] tokens = input.split(regex);
+        String[] tokens = input.split(regex, -1);
         int[] charCount = new int[tokens.length];
         int index = 0;
         for (String token : tokens) {
@@ -83,6 +83,9 @@ public class StringCalculator {
         if (separator == null) {
             return null;
         }
+        if (separator.length() == 0) {
+            throw new IllegalArgumentException();
+        }
         if (separator.matches("\\d+")) {
             throw new IllegalArgumentException();
         }
@@ -90,6 +93,46 @@ public class StringCalculator {
             throw new IllegalArgumentException();
         }
         return separator;
+    }
+
+    private String escapeRegex(String s) {
+        if (s == null || s.isEmpty()) {
+            return s;
+        }
+
+        String specials = "\\.^$|?*+()[]{}";
+        String result = "";
+
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (specials.indexOf(c) != -1) {
+                result += "\\";
+            }
+            result += c;
+        }
+
+        return result;
+    }
+
+    private String buildRegex(String[] baseSeparators, String extraSeparator) {
+        String regex = String.join("|", baseSeparators);
+
+        if (extraSeparator != null) {
+            if (extraSeparator.isEmpty()) {
+                throw new IllegalArgumentException();
+            }
+            if (extraSeparator.endsWith("|")) {
+                throw new IllegalArgumentException();
+            }
+
+            regex = regex + "|" + escapeRegex(extraSeparator);
+        }
+
+        if (regex.endsWith("|")) {
+            throw new IllegalArgumentException();
+        }
+
+        return regex;
     }
 
     public void calculateString() {
