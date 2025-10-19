@@ -5,7 +5,12 @@ import camp.nextstep.edu.missionutils.Console;
 public class StringCalculator {
     private String getUserInput() {
         System.out.println("덧셈할 문자열을 입력해 주세요.");
-        return Console.readLine();
+        String input = Console.readLine();
+        if (input == null) {
+            throw new IllegalArgumentException();
+        }
+
+        return input;
     }
 
     private int[] StringSplit(String input) {
@@ -21,14 +26,35 @@ public class StringCalculator {
             input = input.substring(ed + 2);
         }
 
+        if ("-".equals(extraSeparator)) {
+            if (input.contains("---")) {
+                throw new IllegalArgumentException();
+            }
+
+            input = input.replaceAll("--", ",-");
+
+            regex = String.join("|", separators);
+
+            if (input.contains(",,") || input.contains("::") || input.contains(",:") || input.contains(":,")) {
+                throw new IllegalArgumentException();
+            }
+        } else {
+            if (input.contains(",,") || input.contains("::") || input.contains(",:") || input.contains(":,")
+                    || (extraSeparator != null && input.contains(extraSeparator + extraSeparator))) {
+                throw new IllegalArgumentException();
+            }
+        }
+
         String[] chars = input.split(regex);
 
         int[] charCnt = new int[chars.length];
+
         int idx = 0;
         for (String ch : chars) {
             String t = ch.trim();
-            if (t.isEmpty()) continue;
+            if (t.isEmpty() || !t.matches("-?\\d+")) throw new IllegalArgumentException();
             charCnt[idx++] = Integer.parseInt(t);
+
         }
 
         int[] result = new int[idx];
@@ -52,9 +78,18 @@ public class StringCalculator {
         int st, ed;
         st = input.indexOf("//");
         ed = input.indexOf("\\n");
-        if (st != -1 && ed != -1) {
+        if ((st != -1 && ed == -1) || (st == -1 && ed != -1)) throw new IllegalArgumentException();
+
+        if (st != -1) {
             separator = input.substring(st + 2, ed);
         }
+
+        if (separator == null) return null;
+
+        if (separator.matches("\\d+")) throw new IllegalArgumentException();
+
+        if (separator.equals(":") || separator.equals(",")) throw new IllegalArgumentException();
+
         return separator;
     }
 
