@@ -3,38 +3,35 @@ package calculator;
 import camp.nextstep.edu.missionutils.Console;
 
 public class StringCalculator {
+
     private String getUserInput() {
         System.out.println("덧셈할 문자열을 입력해 주세요.");
         String input = Console.readLine();
         if (input == null) {
             throw new IllegalArgumentException();
         }
-
         return input;
     }
 
-    private int[] StringSplit(String input) {
-        String[] separators = {":", ","};
+    private int[] splitString(String input) {
+        String[] basicSeparators = {":", ","};
         String extraSeparator = addCustomSeparator(input);
 
-        String regex = String.join("|", separators);
+        String regex = String.join("|", basicSeparators);
 
         if (extraSeparator != null) {
-            regex += "|" + extraSeparator;
-
-            int ed = input.indexOf("\\n");
-            input = input.substring(ed + 2);
+            if (!"-".equals(extraSeparator)) {
+                regex += "|" + extraSeparator;
+            }
+            int endIndex = input.indexOf("\\n");
+            input = input.substring(endIndex + 2);
         }
 
         if ("-".equals(extraSeparator)) {
             if (input.contains("---")) {
                 throw new IllegalArgumentException();
             }
-
             input = input.replaceAll("--", ",-");
-
-            regex = String.join("|", separators);
-
             if (input.contains(",,") || input.contains("::") || input.contains(",:") || input.contains(":,")) {
                 throw new IllegalArgumentException();
             }
@@ -45,23 +42,19 @@ public class StringCalculator {
             }
         }
 
-        String[] chars = input.split(regex);
-
-        int[] charCnt = new int[chars.length];
-
-        int idx = 0;
-        for (String ch : chars) {
-            String t = ch.trim();
-            if (t.isEmpty() || !t.matches("-?\\d+")) throw new IllegalArgumentException();
-            charCnt[idx++] = Integer.parseInt(t);
-
+        String[] tokens = input.split(regex);
+        int[] charCount = new int[tokens.length];
+        int index = 0;
+        for (String token : tokens) {
+            String t = token.trim();
+            if (t.isEmpty() || !t.matches("-?\\d+")) {
+                throw new IllegalArgumentException();
+            }
+            charCount[index++] = Integer.parseInt(t);
         }
 
-        int[] result = new int[idx];
-        for (int i = 0; i < idx; i++) {
-            result[i] = charCnt[i];
-        }
-
+        int[] result = new int[index];
+        System.arraycopy(charCount, 0, result, 0, index);
         return result;
     }
 
@@ -75,28 +68,29 @@ public class StringCalculator {
 
     private String addCustomSeparator(String input) {
         String separator = null;
-        int st, ed;
-        st = input.indexOf("//");
-        ed = input.indexOf("\\n");
-        if ((st != -1 && ed == -1) || (st == -1 && ed != -1)) throw new IllegalArgumentException();
-
-        if (st != -1) {
-            separator = input.substring(st + 2, ed);
+        int startIndex = input.indexOf("//");
+        int endIndex = input.indexOf("\\n");
+        if ((startIndex != -1 && endIndex == -1) || (startIndex == -1 && endIndex != -1)) {
+            throw new IllegalArgumentException();
         }
-
-        if (separator == null) return null;
-
-        if (separator.matches("\\d+")) throw new IllegalArgumentException();
-
-        if (separator.equals(":") || separator.equals(",")) throw new IllegalArgumentException();
-
+        if (startIndex != -1) {
+            separator = input.substring(startIndex + 2, endIndex);
+        }
+        if (separator == null) {
+            return null;
+        }
+        if (separator.matches("\\d+")) {
+            throw new IllegalArgumentException();
+        }
+        if (separator.equals(":") || separator.equals(",")) {
+            throw new IllegalArgumentException();
+        }
         return separator;
     }
 
     public void calculateString() {
         String userInput = getUserInput();
-        int sum = getSum(StringSplit(userInput));
-
+        int sum = getSum(splitString(userInput));
         System.out.println("결과 : " + sum);
     }
 }
