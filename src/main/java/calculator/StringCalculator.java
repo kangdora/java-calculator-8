@@ -28,7 +28,7 @@ public class StringCalculator {
         }
 
         if ("-".equals(extraSeparator)) {
-            if (input.contains("---")) {
+            if (input.indexOf("---") >= 0) {
                 throw new IllegalArgumentException();
             }
             input = input.replaceAll("--", ",-");
