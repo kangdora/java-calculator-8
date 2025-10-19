@@ -32,11 +32,11 @@ public class StringCalculator {
                 throw new IllegalArgumentException();
             }
             input = input.replaceAll("--", ",-");
-            if (input.contains(",,") || input.contains("::") || input.contains(",:") || input.contains(":,")) {
+            if (hasOverlappingSeparator(input)) {
                 throw new IllegalArgumentException();
             }
         } else {
-            if (input.contains(",,") || input.contains("::") || input.contains(",:") || input.contains(":,")
+            if (hasOverlappingSeparator(input)
                     || (extraSeparator != null && input.contains(extraSeparator + extraSeparator))) {
                 throw new IllegalArgumentException();
             }
@@ -56,6 +56,10 @@ public class StringCalculator {
         int[] result = new int[index];
         System.arraycopy(charCount, 0, result, 0, index);
         return result;
+    }
+
+    private boolean hasOverlappingSeparator(String input) {
+        return input.indexOf(",,") >= 0 || input.indexOf("::") >= 0 || input.indexOf(",:") >= 0 || input.indexOf(":,") >= 0;
     }
 
     private int getSum(int[] numbers) {
