@@ -14,7 +14,7 @@ public class StringCalculator {
     }
 
     private int[] splitString(String input) {
-        if (input.isEmpty()) {
+        if (input.length() == 0) {
             return new int[0];
         }
         String[] basicSeparators = {":", ","};
@@ -23,26 +23,8 @@ public class StringCalculator {
         String regex = buildRegex(basicSeparators, "-".equals(extraSeparator) ? null : extraSeparator);
 
         if (extraSeparator != null) {
-            if (!"-".equals(extraSeparator)) {
-                regex += "|" + extraSeparator;
-            }
             int endIndex = input.indexOf("\\n");
             input = input.substring(endIndex + 2);
-        }
-
-        if ("-".equals(extraSeparator)) {
-            if (input.indexOf("---") >= 0) {
-                throw new IllegalArgumentException();
-            }
-            input = input.replaceAll("--", ",-");
-            if (hasOverlappingSeparator(input)) {
-                throw new IllegalArgumentException();
-            }
-        } else {
-            if (hasOverlappingSeparator(input)
-                    || (extraSeparator != null && input.contains(extraSeparator + extraSeparator))) {
-                throw new IllegalArgumentException();
-            }
         }
 
         String[] tokens = input.split(regex, -1);
@@ -50,7 +32,7 @@ public class StringCalculator {
         int index = 0;
         for (String token : tokens) {
             String t = token.trim();
-            if (t.isEmpty() || !t.matches("-?\\d+")) {
+            if (t.length() == 0 || !t.matches("[1-9]\\d*")) {
                 throw new IllegalArgumentException();
             }
             charCount[index++] = Integer.parseInt(t);
