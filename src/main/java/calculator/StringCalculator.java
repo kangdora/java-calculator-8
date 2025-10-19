@@ -14,6 +14,9 @@ public class StringCalculator {
     }
 
     private int[] splitString(String input) {
+        if (input.isEmpty()) {
+            return new int[0];
+        }
         String[] basicSeparators = {":", ","};
         String extraSeparator = addCustomSeparator(input);
 
